@@ -1,4 +1,4 @@
-setwd("/home/ilan/Desktop/Hoy_no_circula")
+setwd("/home/ilanfri/Desktop/Hoy_no_circula")
 
 # http://www.aire.df.gob.mx/default.php?opc=%27aKBhnmI=%27&opcion=aw==
 #download.file("http://148.243.232.112:8080/opendata/IndiceCalidadAire_gz/indice_2015.csv.gz", "indice_2015.csv.gz")
