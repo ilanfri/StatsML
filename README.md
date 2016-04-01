@@ -1,6 +1,8 @@
 # StatsML
 Python and R scripts related mostly to Statistics and Machine Learning
 
+* Hoy_no_circula.R: For several decades now Mexico City has had restrictions on the days of the week cars of a certain age may may be used, with the purpose of reducing Mexico City's severe air pollution problem. As of the 9th of July 2015 the criteria was changed to be based on the emissions of the car, rather than its age. A debate has ensued as to whether this change has made any difference whatsoever. In this R code I take carbon monoxide data from central Mexico City and use Google's CausalImpact module to attempt to estimate from the corresponding time series whether or not this change/intervention is likely to have had a causal effect on carbon monoxide levels.
+
 * Bayesian_bootstrap.ipynb: A Python implementation of Rasmus Baath's (@rasmusab) R Bayesian bootstrap code.
 
 * lead_generation.ipynb: A prototype for a Business-to-Business lead generation recommendation engine. Uses a database of companies (the Companies House listing) to search for companies by name (using PyGoogle), identify their 'About Us' webpage, extract the body of the text, preprocess it, and perform topic modelling on it, such that a query can be made and LDA topic projections can be used to identify potential client companies from the companies analysed.
