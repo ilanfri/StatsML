@@ -58,18 +58,40 @@ library(dplyr)
 # CausalImpact doesn't like multiple entries with the same timestamp, summarise by taking mean over hours to get single value per day
 data_mean = data %>% group_by(Fecha) %>% summarise_each(funs(mean(., na.rm=TRUE)), -Hora)
 
-# To use full data set from start of 2015:
-#before_period = c(head(ozonedata_mean,1)$Fecha, as.Date("2015-07-08"))
-#after_period = c(as.Date("2015-07-09"), tail(ozonedata_mean,1)$Fecha)
-
 # To use symmetric time period before and after intervention, using all data up to latest
 intervention_date = as.Date("2015-07-09")
 intrvtn_to_latest_dt = tail(data_mean,1)$Fecha - intervention_date
 intrvtn_minus_dt = intervention_date - intrvtn_to_latest_dt
 print(sprintf("Considering symmetric period of 2*%s days between %s and %s (intervention: %s)", intrvtn_to_latest_dt, intrvtn_minus_dt, tail(data_mean,1)$Fecha, intervention_date))
 
-before_period = c(seq(tail(data_mean,1)$Fecha, length=2, by="-1 years")[2], as.Date("2015-07-08"))
+# To use symmetric period on either side of the intervention as wide as the latest data allows:
+#before_period = c(seq(tail(data_mean,1)$Fecha, length=2, by="-1 years")[2], as.Date("2015-07-08"))
+#after_period = c(as.Date("2015-07-09"), tail(data_mean,1)$Fecha)
+
+# To use full data set from start of 2015:
+before_period = c(head(data_mean,1)$Fecha, as.Date("2015-07-08"))
 after_period = c(as.Date("2015-07-09"), tail(data_mean,1)$Fecha)
+
+# For the pre data use the dates one year before the intervention, to account for seasonality
+# This will require standard scaling
+
+# Apply standard scaling, to the pre and post data, separately
+# Use this if pre period is for example from the same months but a year before (to account for seasonality)
+pre_data = data_mean[which(data_mean$Fecha >= before_period[1] & data_mean$Fecha <= before_period[2]), ]
+post_data = data_mean[which(data_mean$Fecha >= after_period[1] & data_mean$Fecha <= after_period[2]), ]
+#pre_data$Centro.mon.xido.de.carbono = scale(pre_data$Centro.mon.xido.de.carbono)
+#post_data$Centro.mon.xido.de.carbono = scale(post_data$Centro.mon.xido.de.carbono)
+
+pre_mean = mean(pre_data$Centro.mon.xido.de.carbono)
+pre_sd = sd(pre_data$Centro.mon.xido.de.carbono)
+
+# Standard scale with the mean and sd of the pre-intervention data
+# Doing this with each pre and post means and sd separately would remove all information in the normalisation,
+#    which would only be appropriate if comparing data from a year earlier to current data, for example
+pre_data$Centro.mon.xido.de.carbono = (pre_data$Centro.mon.xido.de.carbono - pre_mean)/pre_sd
+post_data$Centro.mon.xido.de.carbono = (post_data$Centro.mon.xido.de.carbono - pre_mean)/pre_sd
+
+data_mean = merge(pre_data, post_data, all=TRUE)
 
 # Convect data to time series
 library(zoo)
